@@ -80,7 +80,16 @@ async def pollstreams():
         live = livestream_poller.pollTwitchStatus(channel)
         # if they're live now and they weren't before, post in the channel
         if live and not twitch_channels[channel]:
-            await output_channel.send(livestream_poller.createTwitchPollRoute(channel))
+            metadata = livestream_poller.getTwitchMetadata(channel)
+            if metadata is None: # no yt-dlp to fetch metadata, just post link
+                await output_channel.send(livestream_poller.createTwitchPollRoute(channel))
+            else:
+                # make an EMBED
+                desc = metadata["description"]
+                desc += "\n\n" + livestream_poller.createTwitchPollRoute(channel)
+                embed = discord.Embed(title=metadata["uploader"], url=livestream_poller.createTwitchPollRoute(channel), description=desc, color=discord.Colour.from_rgb(100, 65, 165))
+                embed.set_image(url=metadata["thumbnail"])
+                await output_channel.send(embed=embed)
 
         twitch_channels[channel] = live
 

@@ -67,8 +67,8 @@ def getTwitchMetadata(channelID):
     if not have_ytdlp:
         return None
     else:
-        result = subprocess.run(["yt-dlp", createTwitchPollRoute(channelID), "-s"], capture_output=True).stdout
-        return result.stdout
+        result = subprocess.run(["yt-dlp", createTwitchPollRoute(channelID), "-sj"], capture_output=True)
+        return json.loads(result.stdout)
 
 def pollTwitchStatus(channelID):
     if have_ytdlp:
